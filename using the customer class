@@ -1,0 +1,12 @@
+Customer customer;
+
+void setup() {
+  size(400, 400);
+  customer = new Customer("Alice", width/2, height/2);
+}
+
+void draw() {
+  background(255);
+  customer.update();
+  customer.display();
+}
