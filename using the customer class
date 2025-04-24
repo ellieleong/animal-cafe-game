@@ -1,12 +1,78 @@
-Customer customer;
+ArrayList<Customer> customers;
+String[] names = {"Alice", "Bob", "Coco", "Daisy", "Eddie"};
+int spawnTimer = 0;
 
 void setup() {
-  size(400, 400);
-  customer = new Customer("Alice", width/2, height/2);
+  size(800, 400);
+  customers = new ArrayList<Customer>();
 }
 
 void draw() {
   background(255);
-  customer.update();
-  customer.display();
+
+  // Check if there's no one in the waiting state
+  boolean someoneIsWaiting = false;
+  for (Customer c : customers) {
+    if (c.state.equals("waiting")) {
+      someoneIsWaiting = true;
+      break;
+    }
+  }
+
+  spawnTimer++;
+  if (spawnTimer > 120 && !someoneIsWaiting) {
+    customers.add(new Customer(randomName(), 0, height / 2));
+    spawnTimer = 0;
+  }
+
+  int orderingIndex = -1;
+  int eatingIndex = -1;
+  int waitingCount = 0;
+
+  // Identify current ordering and eating customers
+  for (int i = 0; i < customers.size(); i++) {
+    Customer c = customers.get(i);
+    if (c.state.equals("ordering") && orderingIndex == -1) {
+      orderingIndex = i;
+    } else if (c.state.equals("eating") && eatingIndex == -1) {
+      eatingIndex = i;
+    }
+  }
+
+  // Update states first
+  for (Customer c : customers) {
+    c.updateState(orderingIndex, eatingIndex);
+  }
+
+  // Now assign targetX values AFTER state transitions
+  for (Customer c : customers) {
+    switch (c.state) {
+      case "waiting":
+        c.targetX = 100 + waitingCount * 45;
+        waitingCount++;
+        break;
+      case "ordering":
+        c.targetX = 400;
+        break;
+      case "eating":
+        c.targetX = 500;
+        break;
+      case "exiting":
+        // No targetX needed
+        break;
+    }
+  }
+
+  // Update movement and draw everything
+  for (Customer c : customers) {
+    c.update();
+    c.display();
+  }
+
+  // Remove customers who exited the screen
+  customers.removeIf(c -> c.state.equals("exiting") && c.x > width);
+}
+
+String randomName() {
+  return names[(int)random(names.length)];
 }
