@@ -1,44 +1,67 @@
+// --- Customer class ---
 class Customer {
   String name;
-  PVector position;
+  float x, y;
+  float targetX;
   String state;
-  int waitTime;
-  color shirtColor;
+  int stateTimer;
 
   Customer(String name, float x, float y) {
     this.name = name;
-    position = new PVector(x, y);
-    state = "waiting"; // could also be: "ordering", "eating", "leaving"
-    waitTime = int(random(60, 180)); // wait time in frames (1 sec = 60 frames)
-    shirtColor = color(random(255), random(255), random(255));
+    this.x = x;
+    this.y = y;
+    this.targetX = 100;  // Initial waiting spot
+    this.state = "waiting";
+    this.stateTimer = 0;
   }
 
-  void update() {
-    if (waitTime > 0) {
-      waitTime--;
-    } else {
-      nextState();
+  void updateState(int orderingIndex, int eatingIndex) {
+    stateTimer++;
+
+    switch(state) {
+      case "waiting":
+        if (orderingIndex == -1) {
+          state = "ordering";
+          stateTimer = 0;
+        }
+        break;
+
+      case "ordering":
+        if (stateTimer > 120 && eatingIndex == -1) {
+          state = "eating";
+          stateTimer = 0;
+        }
+        break;
+
+      case "eating":
+        if (stateTimer > 180) {
+          state = "exiting";
+        }
+        break;
+
+      case "exiting":
+        // handled in update()
+        break;
     }
   }
 
-  void nextState() {
-    if (state.equals("waiting")) {
-      state = "ordering";
-      waitTime = 120;
-    } else if (state.equals("ordering")) {
-      state = "eating";
-      waitTime = 180;
-    } else if (state.equals("eating")) {
-      state = "leaving";
-      waitTime = 60;
+  void update() {
+    if (!state.equals("exiting")) {
+      x += (targetX - x) * 0.1;
+    } else {
+      x += 2;
     }
   }
 
   void display() {
-    fill(shirtColor);
-    ellipse(position.x, position.y, 40, 40); // simple face/body
     fill(0);
     textAlign(CENTER);
-    text(name + "\n" + state, position.x, position.y + 30);
+    ellipse(x, y, 40, 40);
+    fill(255);
+    text(name.charAt(0), x, y + 5);
+
+    fill(0);
+    textAlign(LEFT);
+    text(state, x + 25, y);
   }
 }
