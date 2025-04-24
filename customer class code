@@ -1,0 +1,44 @@
+class Customer {
+  String name;
+  PVector position;
+  String state;
+  int waitTime;
+  color shirtColor;
+
+  Customer(String name, float x, float y) {
+    this.name = name;
+    position = new PVector(x, y);
+    state = "waiting"; // could also be: "ordering", "eating", "leaving"
+    waitTime = int(random(60, 180)); // wait time in frames (1 sec = 60 frames)
+    shirtColor = color(random(255), random(255), random(255));
+  }
+
+  void update() {
+    if (waitTime > 0) {
+      waitTime--;
+    } else {
+      nextState();
+    }
+  }
+
+  void nextState() {
+    if (state.equals("waiting")) {
+      state = "ordering";
+      waitTime = 120;
+    } else if (state.equals("ordering")) {
+      state = "eating";
+      waitTime = 180;
+    } else if (state.equals("eating")) {
+      state = "leaving";
+      waitTime = 60;
+    }
+  }
+
+  void display() {
+    fill(shirtColor);
+    ellipse(position.x, position.y, 40, 40); // simple face/body
+    fill(0);
+    textAlign(CENTER);
+    text(name + "\n" + state, position.x, position.y + 30);
+  }
+}
