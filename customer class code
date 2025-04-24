@@ -10,50 +10,37 @@ class Customer {
     this.name = name;
     this.x = x;
     this.y = y;
-    this.targetX = 100;  // Initial waiting spot
+    this.targetX = 100;
     this.state = "waiting";
     this.stateTimer = 0;
   }
 
-  void updateState(int orderingIndex, int eatingIndex) {
+  void stateTransitions(int orderingIndex, int eatingIndex) {
     stateTimer++;
 
-    switch(state) {
-      case "waiting":
-        if (orderingIndex == -1) {
-          state = "ordering";
-          stateTimer = 0;
-        }
-        break;
-
-      case "ordering":
-        if (stateTimer > 120 && eatingIndex == -1) {
-          state = "eating";
-          stateTimer = 0;
-        }
-        break;
-
-      case "eating":
-        if (stateTimer > 180) {
-          state = "exiting";
-        }
-        break;
-
-      case "exiting":
-        // handled in update()
-        break;
+    if (state.equals("waiting") && orderingIndex == -1) {
+      state = "ordering";
+      stateTimer = 0;
+    } else if (state.equals("ordering") && stateTimer > 120 && eatingIndex == -1) {
+      state = "eating";
+      stateTimer = 0;
+    } else if (state.equals("eating") && stateTimer > 180) {
+      state = "exiting";
     }
   }
 
-  void update() {
+  void updateTargetX(float tx) {
+    targetX = tx;
+  }
+
+  void stepAndDraw() {
     if (!state.equals("exiting")) {
       x += (targetX - x) * 0.1;
     } else {
       x += 2;
     }
-  }
 
-  void display() {
+    // Draw
     fill(0);
     textAlign(CENTER);
     ellipse(x, y, 40, 40);
