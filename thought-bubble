@@ -1,0 +1,204 @@
+
+class FoodCircle {
+  float x, y, r;
+  color c;
+  boolean beingDragged = false;
+
+  FoodCircle(float x, float y, float r, color c) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.c = c;
+  }
+
+  void update() {
+    if (beingDragged) {
+      x = mouseX;
+      y = mouseY;
+    }
+  }
+
+  void display() {
+    fill(c);
+    noStroke();
+    ellipse(x, y, r * 2, r * 2);
+  }
+
+  boolean isMouseOver() {
+    return dist(mouseX, mouseY, x, y) < r;
+  }
+}
+
+
+class Customer {
+  float x, y;
+  float speed = 3;
+  boolean arriving = true;
+  boolean waiting = false;
+  boolean leaving = false;
+  boolean thoughtBubbleVisible = false;
+  boolean orderCompleted = false;
+  color orderColor;
+
+  Customer(float startY) {
+    x = -50;
+    y = startY;
+    randomizeOrder();
+  }
+
+  void randomizeOrder() {
+    color[] possibleColors = {
+      color(255, 0, 0),   // red
+      color(0, 100, 255), // blue
+      color(139, 69, 19), // brown
+      color(255, 165, 0)  // orange
+    };
+    orderColor = possibleColors[int(random(possibleColors.length))];
+  }
+
+  void update() {
+    if (arriving) {
+      x += speed;
+      if (x >= width/2 - 25) {
+        arriving = false;
+        waiting = true;
+        thoughtBubbleVisible = true;
+      }
+    } else if (leaving) {
+      x += speed;
+    }
+  }
+
+  void display() {
+    fill(150, 200, 250);
+    rect(x, y, 50, 50, 10);
+    
+    if (thoughtBubbleVisible) {
+      drawThoughtBubble();
+    }
+  }
+
+  void drawThoughtBubble() {
+    float bubbleX = x + 25;
+    float bubbleY = y - 100;
+    
+    fill(255);
+    stroke(0);
+    strokeWeight(2);
+    beginShape();
+    vertex(bubbleX - 60, bubbleY);
+    bezierVertex(bubbleX - 90, bubbleY - 40, bubbleX + 90, bubbleY - 40, bubbleX + 60, bubbleY);
+    bezierVertex(bubbleX + 90, bubbleY + 40, bubbleX - 90, bubbleY + 40, bubbleX - 60, bubbleY);
+    endShape(CLOSE);
+
+    ellipse(bubbleX - 20, bubbleY + 50, 20, 20);
+    ellipse(bubbleX - 35, bubbleY + 65, 12, 12);
+
+    fill(orderColor);
+    noStroke();
+    rect(bubbleX - 15, bubbleY - 15, 30, 30, 5);
+  }
+
+  boolean isPlaceholderHovered(float fx, float fy) {
+    float bubbleX = x + 25;
+    float bubbleY = y - 100;
+    return fx > bubbleX - 15 && fx < bubbleX + 15 && fy > bubbleY - 15 && fy < bubbleY + 15;
+  }
+}
+
+ArrayList<FoodCircle> circles = new ArrayList<FoodCircle>();
+FoodCircle draggingCircle = null;
+
+float displayX = 100, displayY = 350;
+float displaySize = 220;
+float circleRadius = 45;
+
+PVector[] circleSpots;
+color[] colors = {
+  color(0, 100, 255),  // blue
+  color(139, 69, 19),  // brown
+  color(255, 0, 0),    // red
+  color(255, 165, 0)   // orange
+};
+
+Customer customer;
+
+void setup() {
+  size(1000, 800);
+  
+  float padding = circleRadius + 10;
+  circleSpots = new PVector[] {
+    new PVector(displayX + padding, displayY + padding),
+    new PVector(displayX + displaySize - padding, displayY + padding),
+    new PVector(displayX + padding, displayY + displaySize - padding),
+    new PVector(displayX + displaySize - padding, displayY + displaySize - padding)
+  };
+  
+  for (int i = 0; i < 4; i++) {
+    circles.add(new FoodCircle(circleSpots[i].x, circleSpots[i].y, circleRadius, colors[i]));
+  }
+  
+  customer = new Customer(height/2);
+}
+
+void draw() {
+  background(240);
+
+  stroke(0);
+  fill(200);
+  rect(displayX, displayY, displaySize, displaySize, 10);
+
+  for (FoodCircle fc : circles) {
+    fc.update();
+    fc.display();
+  }
+
+  customer.update();
+  customer.display();
+
+  if (draggingCircle != null && customer.thoughtBubbleVisible) {
+    if (customer.isPlaceholderHovered(draggingCircle.x, draggingCircle.y)) {
+      if (colorsMatch(draggingCircle.c, customer.orderColor)) {
+
+        circles.remove(draggingCircle);
+
+        customer.thoughtBubbleVisible = false;
+        customer.waiting = false;
+        customer.leaving = true;
+
+        draggingCircle = null;
+      }
+    }
+  }
+}
+
+boolean colorsMatch(color c1, color c2) {
+  return abs(red(c1) - red(c2)) < 5 &&
+         abs(green(c1) - green(c2)) < 5 &&
+         abs(blue(c1) - blue(c2)) < 5;
+}
+
+void mousePressed() {
+  for (int i = circles.size() - 1; i >= 0; i--) {
+    FoodCircle fc = circles.get(i);
+    if (fc.isMouseOver()) {
+      fc.beingDragged = true;
+      draggingCircle = fc;
+
+      for (int j = 0; j < 4; j++) {
+        if (dist(fc.x, fc.y, circleSpots[j].x, circleSpots[j].y) < 5) {
+          circles.add(new FoodCircle(circleSpots[j].x, circleSpots[j].y, circleRadius, colors[j]));
+          break;
+        }
+      }
+      break;
+    }
+  }
+}
+
+void mouseReleased() {
+  if (draggingCircle != null) {
+    draggingCircle.beingDragged = false;
+    draggingCircle = null;
+  }
+}
