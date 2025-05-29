@@ -8,7 +8,8 @@ class Customer {
   boolean waiting = false;
   boolean leaving = false;
   boolean thoughtBubbleVisible = false;
-  color orderColor;
+  String orderType;
+  
 
   Customer(String name, float startY) {
     this.name = name;
@@ -21,13 +22,9 @@ class Customer {
   }
 
   void randomizeOrder() {
-    color[] possibleColors = {
-      color(255, 0, 0),   // red
-      color(0, 100, 255), // blue
-      color(139, 69, 19), // brown
-      color(255, 165, 0)  // orange
-    };
-    orderColor = possibleColors[int(random(possibleColors.length))];
+    String[] possibleTypes  = {"croissant", "sando", "carrotcake", "berries"}; 
+  
+    orderType = possibleTypes[int(random(possibleTypes.length))];
   }
 
   void stateTransitions() {
@@ -54,8 +51,8 @@ class Customer {
     }
   }
 
-  void receiveFood(color givenColor) {
-    if (state.equals("waiting") && colorsMatch(givenColor, orderColor)) {
+  void receiveFood(String givenTypes) {
+    if (state.equals("waiting") && typesMatch(givenTypes, orderType)) {
       thoughtBubbleVisible = false;
       waiting = false;
       state = "eating";
@@ -96,9 +93,12 @@ class Customer {
     ellipse(bubbleX - 20, bubbleY + 50, 20, 20);
     ellipse(bubbleX - 35, bubbleY + 65, 12, 12);
 
-    fill(orderColor);
-    noStroke();
-    rect(bubbleX - 15, bubbleY - 15, 30, 30, 5);
+//    fill(orderType);
+//    noStroke();
+//    rect(bubbleX - 15, bubbleY - 15, 30, 30, 5);
+      fill(0);
+      text(orderType, bubbleX -20, bubbleY - 15);
+
   }
 
   boolean isPlaceholderHovered(float fx, float fy) {
@@ -107,10 +107,8 @@ class Customer {
     return fx > bubbleX - 15 && fx < bubbleX + 15 && fy > bubbleY - 15 && fy < bubbleY + 15;
   }
 
-  boolean colorsMatch(color c1, color c2) {
-    return abs(red(c1) - red(c2)) < 5 &&
-           abs(green(c1) - green(c2)) < 5 &&
-           abs(blue(c1) - blue(c2)) < 5;
+  boolean typesMatch(String customerOrder, String draggedType) {
+    return customerOrder == draggedType;
   }
 }
 
