@@ -56,7 +56,7 @@ class Croissant extends FoodCircle {
   }
 }
 
-Subclass of FoodCircle (a sando food item located in middle-right shelf)
+// Subclass of FoodCircle (a sando food item located in middle-right shelf)
 class Sando extends FoodCircle {
   Sando(float x, float y, PImage food_image) {
     super(x, y, food_image, "sando");
@@ -67,7 +67,7 @@ class Sando extends FoodCircle {
   }
 }
 
-Subclass of FoodCircle (a berry bowl item located in bottom-right shelf)
+// Subclass of FoodCircle (a berry bowl item located in bottom-right shelf)
 class Berries extends FoodCircle {
   Berries(float x, float y, PImage food_image) {
     super(x, y, food_image, "berries");
@@ -78,7 +78,7 @@ class Berries extends FoodCircle {
   }
 }
 
-Subclass of FoodCircle (a carrot cake located in bottom-left shelf)
+// Subclass of FoodCircle (a carrot cake located in bottom-left shelf)
 class CarrotCake extends FoodCircle {
   CarrotCake(float x, float y, PImage food_image) {
     super(x, y, food_image, "carrotcake");
