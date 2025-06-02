@@ -1,7 +1,7 @@
 # animal-cafe-game
 
 To download and run this code:
-* cafegameupdated2
-* foodcircle2
-* using customer class2
+* cafegameupdated3
+* foodcircle3
+* using customer class3
 * all the images
