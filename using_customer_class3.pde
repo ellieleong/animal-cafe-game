@@ -1,3 +1,6 @@
+// The Customer class represents an animal customer in the cafe
+// It stores information about the customer's position, order status, mood, and food preference
+// This class also handles displaying the customer and updating their behavior (e.g., ordering or waiting)
 class Customer {
   String name;
   float x, y;
