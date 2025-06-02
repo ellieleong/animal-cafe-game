@@ -1,4 +1,6 @@
-// Class for the draggable food items in the cafe game
+// The FoodCircle class represents a draggable food item in the cafe
+// It stores the food's position, type, and whether it is being dragged
+// This class handles drawing the food on screen and updating its position when dragged by the player
 class FoodCircle {
   float x, y, r = 25;
   color c = color(255);
