@@ -1,6 +1,8 @@
+// Image variables
 PImage background_image;
 PImage countertop_image;
 
+// Food images
 PImage croissant_image;
 PImage sando_image;       
 PImage berries_image;     
@@ -9,11 +11,12 @@ PImage carrotcake_image;
 // Animal images
 PImage pinkCatImage, blackCatImage, bearImage, bunnyImage;
 
+// Game variables
 int foodCost = 3;
 int money = 5;
 
 Customer customer;
-ArrayList<FoodCircle> circles = new ArrayList<FoodCircle>();
+ArrayList<FoodCircle> circles = new ArrayList<FoodCircle>(); // List of draggable food objects
 FoodCircle draggingCircle = null;
 
 void setup() {
@@ -38,6 +41,7 @@ void setup() {
   textSize(16);
   textAlign(CENTER, CENTER);
 
+  // Create food objects and place them on the shelf
   circles.add(new Croissant(10, 50, croissant_image));
   circles.add(new Sando(70, 50, sando_image));    
   circles.add(new Berries(130, 50, berries_image));   
@@ -63,12 +67,13 @@ void draw() {
   berries_image.resize(123, 103);      
   carrotcake_image.resize(140, 123);   
 
+  // Display game status
   fill(0);
   textSize(30);
   text("money: $" + money, 100, 30);
   //text("drag food to animal ( +$" + foodCost + " )", 250, 30);
 
-  // Update food circles
+  // Update and display food circles
   for (FoodCircle fc : circles) {
     if (fc.beingDragged) {
       fc.update();
@@ -76,13 +81,15 @@ void draw() {
     fc.display();
   }
 
-  // Handle dragging food
+  // Handle when food item is being dragged
   if (draggingCircle != null && customer.thoughtBubbleVisible) {
     draggingCircle.display();
+
+    // If food is dropped onto customer's requeest and matches their order
     if (customer.isPlaceholderHovered(draggingCircle.x, draggingCircle.y)) {
       if (customer.state.equals("waiting") && customer.orderType.equals(draggingCircle.type)) {
         money += foodCost;
-        customer.receiveFood(draggingCircle.type);
+        customer.receiveFood(draggingCircle.type); // Serve food
 
         // Reset dragged food position instead of removing it
         draggingCircle.x = draggingCircle.shelfx + 10;
@@ -94,7 +101,7 @@ void draw() {
     }
   }
 
-  // Check if customer exited
+  // Check if customer exited, then spawn new one
   if (customer.leaving && customer.x > width) {
     // Respawn customer, random animal type
     customer = spawnCustomer("A", height / 2 - 200, randomAnimalType());
@@ -102,6 +109,7 @@ void draw() {
 }
 
 void mousePressed() {
+  // Check if mouse is over any food item (top first)
   for (int i = circles.size() - 1; i >= 0; i--) {
     FoodCircle fc = circles.get(i);
     if (fc.isMouseOver()) {
@@ -113,17 +121,20 @@ void mousePressed() {
 }
 
 void mouseReleased() {
+  // Stop dragging when mouse is released
   if (draggingCircle != null) {
     draggingCircle.beingDragged = false;
     draggingCircle = null;
   }
 }
 
+// Function to load background image and resize it
 void load_background_image() {
   background_image = loadImage("background.PNG");
   background_image.resize(1000, 800);
 }
 
+// Function that spawns a new customer with a given animal type
 Customer spawnCustomer(String name, float y, String animalType) {
   if (animalType.equals("pinkCat")) {
     return new Customer(name, y, "pinkCat", pinkCatImage);
@@ -137,16 +148,19 @@ Customer spawnCustomer(String name, float y, String animalType) {
   return null;
 }
 
+// Function that chooses a random animal type from the list
 String randomAnimalType() {
   String[] animals = {"pinkCat", "blackCat", "bear", "bunny"};
   return animals[int(random(animals.length))];
 }
 
+// Function that loads and resizes countertop image
 void load_countertop_image() {
   countertop_image = loadImage("countertop.PNG");
   countertop_image.resize(1000, 800);
 }
 
+// Function that loads all food images
 void load_food_images() {
   croissant_image = loadImage("croisant.PNG");
   sando_image = loadImage("sando.PNG");           
